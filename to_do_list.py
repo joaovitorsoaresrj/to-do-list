@@ -1,8 +1,5 @@
 import os
-
-
-lista_de_comandos = []
-lista_de_apagados = []
+import json
 
 def exibir_lista(lista):
     print("Os itens listados são:")
@@ -27,6 +24,7 @@ def desfazer():
         limpar_tela()
         lista_de_apagados.append(lista_de_comandos[-1])
         lista_de_comandos.pop()
+        salvar(lista_de_comandos, CAMINHO_ARQUIVO)
         exibir_lista(lista_de_comandos)
 
 def refazer():
@@ -37,7 +35,28 @@ def refazer():
         limpar_tela()
         lista_de_comandos.append(lista_de_apagados[-1])
         lista_de_apagados.pop()
+        salvar(lista_de_comandos, CAMINHO_ARQUIVO)
         exibir_lista(lista_de_comandos) 
+
+def ler(tarefas, caminho_arquivo):
+    dados = []
+    try:
+        with open(caminho_arquivo, "r", encoding="utf8") as arquivo:
+            dados = json.load(arquivo)
+    except FileNotFoundError:
+        salvar(tarefas, caminho_arquivo)
+    return dados
+
+def salvar(tarefas, caminho_arquivo):
+    dados = tarefas
+    with open(caminho_arquivo, "w", encoding="utf8") as arquivo:
+        dados = json.dump(tarefas, arquivo, indent=2, ensure_ascii=False)
+    return dados
+
+CAMINHO_ARQUIVO  = "to_do_list.json"
+
+lista_de_comandos = ler([], CAMINHO_ARQUIVO)
+lista_de_apagados = []
 
 limpar_tela()
 print("=" * 70)
@@ -74,5 +93,6 @@ while True:
 
         limpar_tela()
         lista_de_comandos.append(comando_tarefa)
+        salvar(lista_de_comandos, CAMINHO_ARQUIVO)
         print(f"A tarefa {comando_tarefa} foi adicionada.")
 
